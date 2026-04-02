@@ -1,0 +1,80 @@
+@* Recursive partial view — renders one node and calls itself for each child. *@
+@model ItemTreeNode
+
+@{
+    bool hasChildren = Model.Children.Any();
+
+    // Indent increases with depth: 1.5 rem per level
+    var paddingLeft = $"{Model.Level * 1.5}rem";
+
+    // Color badge class cycles through a set of Bootstrap colors
+    string[] badgeColors = { "primary", "success", "info", "warning", "secondary", "dark" };
+    string badgeClass = badgeColors[Model.Level % badgeColors.Length];
+}
+
+<ul class="tree-node list-unstyled mb-0" data-level="@Model.Level"
+    style="padding-left: @paddingLeft; margin-bottom:0;">
+    <li class="d-flex align-items-start py-1 border-bottom border-light">
+
+        <!-- Toggle button (only shown when there are children) -->
+        <button type="button"
+                onclick="toggleNode(this)"
+                class="toggle-btn btn btn-sm btn-link text-decoration-none p-0 me-1"
+                style="min-width:22px; visibility: @(hasChildren ? "visible" : "hidden");"
+                title="@(hasChildren ? "Expand/Collapse" : "")">
+            <i class="bi @(hasChildren ? "bi-chevron-right" : "") text-primary"></i>
+        </button>
+
+        <!-- Node icon -->
+        <i class="bi @(hasChildren ? "bi-folder2" : "bi-box") me-2 mt-1
+                   text-@(hasChildren ? "warning" : "secondary")"></i>
+
+        <!-- Item info -->
+        <div class="flex-grow-1">
+            <span class="fw-semibold">@Model.Item.Name</span>
+            <span class="badge bg-@badgeClass ms-2" style="font-size:.7rem;">
+                Level @Model.Level
+            </span>
+            <span class="text-muted small ms-2">
+                @Model.Item.Weight.ToString("0.###") kg
+            </span>
+            @if (hasChildren)
+            {
+                <span class="badge bg-light text-dark border ms-1" style="font-size:.7rem;">
+                    <i class="bi bi-diagram-3 me-1"></i>@Model.Children.Count child(ren)
+                </span>
+            }
+        </div>
+
+        <!-- Action buttons -->
+        <div class="ms-auto d-flex gap-1 flex-shrink-0">
+            <a asp-action="Details"  asp-route-id="@Model.Item.Id"
+               class="btn btn-xs btn-outline-info"    title="Details" style="padding:2px 7px; font-size:.75rem;">
+                <i class="bi bi-eye"></i>
+            </a>
+            <a asp-action="Edit"     asp-route-id="@Model.Item.Id"
+               class="btn btn-xs btn-outline-warning" title="Edit"    style="padding:2px 7px; font-size:.75rem;">
+                <i class="bi bi-pencil"></i>
+            </a>
+            <a asp-action="AddChild" asp-route-id="@Model.Item.Id"
+               class="btn btn-xs btn-outline-success" title="Add child" style="padding:2px 7px; font-size:.75rem;">
+                <i class="bi bi-diagram-3"></i>
+            </a>
+            <a asp-action="Delete"   asp-route-id="@Model.Item.Id"
+               class="btn btn-xs btn-outline-danger"  title="Delete"  style="padding:2px 7px; font-size:.75rem;">
+                <i class="bi bi-trash"></i>
+            </a>
+        </div>
+    </li>
+
+    @* ── Recursive: render children ───────────────────────── *@
+    @if (hasChildren)
+    {
+        <div class="tree-children">
+            @foreach (var child in Model.Children)
+            {
+                @await Html.PartialAsync("_TreeNode", child)
+            }
+        </div>
+    }
+</ul>

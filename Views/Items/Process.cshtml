@@ -1,0 +1,155 @@
+@model ItemProcessingApp.Models.ProcessItemViewModel
+
+@{
+    ViewData["Title"] = "Process Item";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-0">
+                    <i class="bi bi-diagram-3 text-success me-2"></i>Process Item
+                </h2>
+                <div class="text-muted small mt-1">
+                    Select a parent item and create one or more output child items (with weights).
+                </div>
+            </div>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Back to Items
+            </a>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                <form asp-action="Process" method="post" id="processForm">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-4">
+                        <label asp-for="ParentId" class="form-label fw-semibold"></label>
+                        <select asp-for="ParentId" asp-items="ViewBag.ParentId" class="form-select form-select-lg">
+                            <option value="">— Select parent —</option>
+                        </select>
+                        <span asp-validation-for="ParentId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="mb-0">
+                            <i class="bi bi-box-seam me-2"></i>Output Items
+                        </h5>
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="addOutputRow()">
+                            <i class="bi bi-plus-circle me-1"></i>Add Output
+                        </button>
+                    </div>
+
+                    <div id="outputsRows">
+                        @for (int i = 0; i < Model.Outputs.Count; i++)
+                        {
+                            <div class="row g-2 align-items-end mb-2 output-row" data-index="@i">
+                                <div class="col-md-6">
+                                    <label class="form-label">Output Name</label>
+                                    <input class="form-control"
+                                           name="Outputs[@i].Name"
+                                           value="@Model.Outputs[i].Name"
+                                           placeholder="e.g. Part A1" />
+                                    <span class="text-danger small field-validation-valid"
+                                          data-valmsg-for="Outputs[@i].Name"
+                                          data-valmsg-replace="true"></span>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">Weight (kg)</label>
+                                    <input class="form-control"
+                                           name="Outputs[@i].Weight"
+                                           type="number"
+                                           step="0.001"
+                                           min="0.001"
+                                           value="@Model.Outputs[i].Weight"
+                                           placeholder="e.g. 2.500" />
+                                    <span class="text-danger small field-validation-valid"
+                                          data-valmsg-for="Outputs[@i].Weight"
+                                          data-valmsg-replace="true"></span>
+                                </div>
+
+                                <div class="col-md-2 d-grid">
+                                    <button type="button" class="btn btn-outline-danger"
+                                            onclick="removeOutputRow(this)"
+                                            @(i == 0 ? "disabled" : null)>
+                                        <i class="bi bi-dash me-1"></i>Remove
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check2-circle me-1"></i>Process
+                        </button>
+                        <a asp-action="Tree" class="btn btn-outline-secondary">
+                            <i class="bi bi-diagram-2 me-1"></i>View Tree
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        let outputRowIndex = @Model.Outputs.Count;
+
+        function addOutputRow() {
+            const container = document.getElementById('outputsRows');
+            const i = outputRowIndex++;
+
+            const row = document.createElement('div');
+            row.className = 'row g-2 align-items-end mb-2 output-row';
+            row.setAttribute('data-index', i);
+
+            row.innerHTML = `
+                <div class="col-md-6">
+                    <label class="form-label">Output Name</label>
+                    <input class="form-control"
+                           name="Outputs[${i}].Name"
+                           placeholder="e.g. Part A1" />
+                    <span class="text-danger small field-validation-valid"
+                          data-valmsg-for="Outputs[${i}].Name"
+                          data-valmsg-replace="true"></span>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Weight (kg)</label>
+                    <input class="form-control"
+                           name="Outputs[${i}].Weight"
+                           type="number"
+                           step="0.001"
+                           min="0.001"
+                           placeholder="e.g. 2.500" />
+                    <span class="text-danger small field-validation-valid"
+                          data-valmsg-for="Outputs[${i}].Weight"
+                          data-valmsg-replace="true"></span>
+                </div>
+                <div class="col-md-2 d-grid">
+                    <button type="button" class="btn btn-outline-danger"
+                            onclick="removeOutputRow(this)">
+                        <i class="bi bi-dash me-1"></i>Remove
+                    </button>
+                </div>
+            `;
+
+            container.appendChild(row);
+        }
+
+        function removeOutputRow(btn) {
+            const row = btn.closest('.output-row');
+            if (!row) return;
+            row.remove();
+        }
+    </script>
+}
+

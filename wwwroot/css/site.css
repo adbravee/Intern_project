@@ -1,0 +1,73 @@
+/* ── General ─────────────────────────────────────────────── */
+html {
+    font-size: 15px;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8f9fa;
+}
+
+main {
+    flex: 1;
+}
+
+/* ── Navbar ──────────────────────────────────────────────── */
+.navbar-brand {
+    font-size: 1.25rem;
+    letter-spacing: .5px;
+}
+
+/* ── Cards ───────────────────────────────────────────────── */
+.card {
+    border-radius: 0.6rem;
+}
+
+.card-header {
+    border-radius: 0.6rem 0.6rem 0 0 !important;
+}
+
+/* ── Table ───────────────────────────────────────────────── */
+.table th {
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: #6c757d;
+}
+
+/* ── Tree ────────────────────────────────────────────────── */
+#item-tree {
+    font-size: .9rem;
+}
+
+.tree-node li {
+    transition: background-color .15s;
+    border-radius: 4px;
+}
+
+.tree-node li:hover {
+    background-color: #f0f4ff;
+}
+
+.tree-children {
+    /* children are shown/hidden via JS */
+    border-left: 2px solid #dee2e6;
+    margin-left: 1rem;
+}
+
+/* ── Validation ──────────────────────────────────────────── */
+.field-validation-error {
+    font-size: .85rem;
+}
+
+/* ── Alerts ──────────────────────────────────────────────── */
+.alert {
+    border-radius: .5rem;
+}
+
+/* ── Footer ──────────────────────────────────────────────── */
+.footer {
+    font-size: .85rem;
+}

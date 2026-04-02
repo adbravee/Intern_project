@@ -1,0 +1,91 @@
+@{
+    ViewData["Title"] = "Add Child Item";
+    var parent = (Item)ViewBag.ParentItem;
+    var candidates = (IEnumerable<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>)ViewBag.Candidates;
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+
+        <div class="d-flex align-items-center mb-4">
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm me-3">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <h2 class="fw-bold mb-0">
+                <i class="bi bi-diagram-3 text-success me-2"></i>Add Child Item
+            </h2>
+        </div>
+
+        <!-- Parent info card -->
+        <div class="card bg-light border-0 mb-3">
+            <div class="card-body py-2 px-3">
+                <small class="text-muted">Assigning a child to parent:</small>
+                <div class="fw-semibold">
+                    <i class="bi bi-box text-primary me-1"></i>
+                    @parent.Name
+                    <span class="badge bg-secondary ms-1">#@parent.Id</span>
+                    &mdash; @parent.Weight.ToString("0.###") kg
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+
+                @if (!candidates.Any())
+                {
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        No eligible items to assign as children.
+                        All items are either already children, ancestors, or this item itself.
+                        <br /><br />
+                        <a asp-action="Create" class="btn btn-sm btn-primary">
+                            <i class="bi bi-plus-circle me-1"></i>Create a new item first
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <form asp-action="AddChild" asp-route-id="@parent.Id" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-4">
+                            <label for="childId" class="form-label fw-semibold">
+                                Select Item to Become Child
+                            </label>
+                            <select name="childId" id="childId" class="form-select form-select-lg">
+                                <option value="">— Choose an item —</option>
+                                @foreach (var item in candidates)
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            </select>
+                            <div class="form-text">
+                                <i class="bi bi-shield-check me-1 text-success"></i>
+                                Circular references are automatically prevented.
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-link-45deg me-1"></i>Assign as Child
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                }
+
+            </div>
+        </div>
+
+        <!-- Hint box -->
+        <div class="card mt-3 border-0 bg-light">
+            <div class="card-body py-2 px-3 small text-muted">
+                <i class="bi bi-lightbulb me-1 text-warning"></i>
+                <strong>Tip:</strong> You can also create a brand-new item with this item as its parent
+                using the <a asp-action="Create">Create Item</a> page and selecting the parent there.
+            </div>
+        </div>
+
+    </div>
+</div>

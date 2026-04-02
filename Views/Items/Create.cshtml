@@ -1,0 +1,74 @@
+@model Item
+@{
+    ViewData["Title"] = "Create Item";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+
+        <div class="d-flex align-items-center mb-4">
+            <a asp-action="Index" class="btn btn-outline-secondary btn-sm me-3">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <h2 class="fw-bold mb-0">
+                <i class="bi bi-plus-circle text-primary me-2"></i>Create New Item
+            </h2>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+
+                <form asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <!-- Validation summary -->
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <!-- Name -->
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label fw-semibold"></label>
+                        <input asp-for="Name" class="form-control" placeholder="e.g. Root Assembly" />
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Weight -->
+                    <div class="mb-3">
+                        <label asp-for="Weight" class="form-label fw-semibold"></label>
+                        <div class="input-group">
+                            <input asp-for="Weight" class="form-control" type="number"
+                                   step="0.001" min="0.001" placeholder="e.g. 1.5" />
+                            <span class="input-group-text">kg</span>
+                        </div>
+                        <span asp-validation-for="Weight" class="text-danger small"></span>
+                        <div class="form-text">Must be greater than 0.</div>
+                    </div>
+
+                    <!-- Parent (optional) -->
+                    <div class="mb-4">
+                        <label asp-for="ParentId" class="form-label fw-semibold">
+                            Parent Item <span class="text-muted fw-normal">(optional)</span>
+                        </label>
+                        <select asp-for="ParentId" asp-items="ViewBag.ParentId"
+                                class="form-select">
+                            <option value="">— No parent (root item) —</option>
+                        </select>
+                        <span asp-validation-for="ParentId" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-1"></i>Create
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}
